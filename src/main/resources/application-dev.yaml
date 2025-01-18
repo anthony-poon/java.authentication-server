@@ -1,0 +1,23 @@
+application:
+  authorization:
+    secret: some-very-very-very-very-very-very-very-very-very-very-long-secret
+    callbacks:
+      - http://localhost:4080/authorize/callback
+
+  services:
+    keys:
+      - name: Service 1
+        value: some-very-very-very-very-long-api-key-1
+      - name: Service 2
+        value: some-very-very-very-very-long-api-key-2
+
+  initialization:
+    users:
+      - username: user
+        password: P@ssw0rd
+        roles:
+          - USER
+      - username: admin
+        password: P@ssw0rd
+        roles:
+          - ADMIN
