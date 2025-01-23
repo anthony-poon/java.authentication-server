@@ -1,6 +1,7 @@
 package com.anthonypoon.authenticationserver.config.initialization.runner;
 
 import com.anthonypoon.authenticationserver.config.initialization.InitializationConfig;
+import com.anthonypoon.authenticationserver.persistence.entity.UserProfile;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.auth.data.UserRegistrationData;
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrincipleDuplicatedException;
@@ -40,6 +41,7 @@ public class DefaultUserRunner implements InitializationRunner {
                 .map(entry -> UserRegistrationData.builder()
                         .username(entry.getUsername())
                         .password(entry.getPassword())
+                        .displayName("Some Display Name")
                         .roles(entry.getRoles())
                         .isValidated(true)
                         .build())

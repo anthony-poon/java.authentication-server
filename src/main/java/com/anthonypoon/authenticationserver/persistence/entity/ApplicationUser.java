@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cascade;
 
 import java.util.Set;
 
@@ -40,4 +41,7 @@ public class ApplicationUser extends AuditableEntity {
     @CollectionTable(name = "APPLICATION_USER_ROLES", joinColumns = @JoinColumn(name = "application_user_id"))
     @Column(name = "application_user_role")
     private Set<UserRole> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile profile;
 }

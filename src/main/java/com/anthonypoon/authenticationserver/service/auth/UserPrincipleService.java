@@ -1,6 +1,7 @@
 package com.anthonypoon.authenticationserver.service.auth;
 
 import com.anthonypoon.authenticationserver.persistence.entity.ApplicationUser;
+import com.anthonypoon.authenticationserver.persistence.entity.UserProfile;
 import com.anthonypoon.authenticationserver.persistence.repository.ApplicationUserRepository;
 import com.anthonypoon.authenticationserver.service.auth.data.UserRegistrationData;
 import com.anthonypoon.authenticationserver.service.auth.data.UserUpdateData;
@@ -52,17 +53,21 @@ public class UserPrincipleService {
         for (UserRegistrationData datum : data) {
             // TODO: Audit log
             this.policy.validate(datum.getPassword());
-            users.add(
-                ApplicationUser.builder()
-                        .username(datum.getUsername())
-                        .password(encoder.encode(datum.getPassword()))
-                        .identifier(UUID.randomUUID().toString())
-                        .email(datum.getEmail())
-                        .isEnabled(true)
-                        .isValidated(datum.isValidated())
-                        .roles(datum.getRoles())
-                        .build()
-            );
+            var user = ApplicationUser.builder()
+                    .username(datum.getUsername())
+                    .password(encoder.encode(datum.getPassword()))
+                    .identifier(UUID.randomUUID().toString())
+                    .email(datum.getEmail())
+                    .isEnabled(true)
+                    .isValidated(datum.isValidated())
+                    .roles(datum.getRoles())
+                    .build();
+            var profile = UserProfile.builder()
+                    .user(user)
+                    .displayName(datum.getDisplayName())
+                    .build();
+            user.setProfile(profile);
+            users.add(user);
         }
         this.users.saveAll(users);
         return users.stream().map(UserPrinciple::getInstance).collect(Collectors.toList());

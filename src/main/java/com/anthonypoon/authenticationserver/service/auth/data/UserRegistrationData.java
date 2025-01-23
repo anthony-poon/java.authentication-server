@@ -12,6 +12,7 @@ public class UserRegistrationData {
     private final String username;
     private final String password;
     private final String email;
+    private final String displayName;
     private final boolean isValidated;
     private final Set<UserRole> roles;
 }

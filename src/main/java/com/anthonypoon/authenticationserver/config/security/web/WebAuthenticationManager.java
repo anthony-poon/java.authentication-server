@@ -64,10 +64,10 @@ public class WebAuthenticationManager implements AuthenticationManager {
     private Collection<SimpleGrantedAuthority> getAuthority(UserPrinciple user) {
         var roles = user.getRoles();
         var auths = roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.toString()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toString()))
                 .collect(Collectors.toSet());
         this.reauthenticateIfExist(auths);
-        return auths.stream().map(auth -> new SimpleGrantedAuthority(auth.toString())).toList();
+        return auths;
     }
 
     private void reauthenticateIfExist(Set<SimpleGrantedAuthority> roles) {
@@ -84,7 +84,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
             if (!user.isEnabled()) {
                 throw new DisabledException("User is disabled");
             }
-            roles.add(new SimpleGrantedAuthority(TemporaryRole.REAUTHENTICATED_ACCESS.toString()));
+            roles.add(new SimpleGrantedAuthority("ROLE_" + TemporaryRole.REAUTHENTICATED_ACCESS));
         } catch (AuthTokenException ex) {
             throw new BadCredentialsException("Invalid token.");
         }
