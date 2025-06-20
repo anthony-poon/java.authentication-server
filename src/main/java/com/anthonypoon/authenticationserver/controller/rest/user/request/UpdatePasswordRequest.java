@@ -1,16 +1,14 @@
 package com.anthonypoon.authenticationserver.controller.rest.user.request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class UpdateProfileRequest {
+public class UpdatePasswordRequest {
     @NotBlank
-    private String displayName;
+    private String oldPassword;
     @NotBlank
-    @Email
-    private String email;
+    private String newPassword;
 }

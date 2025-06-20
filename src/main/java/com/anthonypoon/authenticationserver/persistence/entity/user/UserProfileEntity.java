@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.persistence.entity;
+package com.anthonypoon.authenticationserver.persistence.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,14 +11,14 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class UserProfile {
+public class UserProfileEntity {
     @Id
     @SequenceGenerator(name = "SEQ_USER_PROFILE_ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_USER_PROFILE_ID")
     private Long id;
 
     @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private ApplicationUser user;
+    private ApplicationUserEntity user;
 
     private String displayName;
 }

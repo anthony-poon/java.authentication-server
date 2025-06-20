@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.service.auth.encoder;
+package com.anthonypoon.authenticationserver.service.token.claim;
 
 import com.anthonypoon.authenticationserver.service.DateTimeService;
 import com.anthonypoon.authenticationserver.config.auth.AuthorizationConfig;
@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JWTEncoder extends Encoder {
+public class JWTClaimEncoder extends ClaimEncoder {
     private final DateTimeService dateTime;
     private final AuthorizationConfig config;
 
-    public JWTEncoder(DateTimeService dateTime, AuthorizationConfig config) {
+    public JWTClaimEncoder(DateTimeService dateTime, AuthorizationConfig config) {
         if (StringUtils.isEmpty(config.getSecret())) {
             throw new RuntimeException("JWT Secret is not set in configuration");
         }

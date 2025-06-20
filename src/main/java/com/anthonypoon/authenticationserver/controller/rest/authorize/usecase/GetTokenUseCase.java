@@ -8,12 +8,14 @@ import com.anthonypoon.authenticationserver.controller.rest.authorize.response.C
 import com.anthonypoon.authenticationserver.controller.rest.authorize.response.SuccessTokenResponse;
 import com.anthonypoon.authenticationserver.exception.impl.BadRequestException;
 import com.anthonypoon.authenticationserver.exception.impl.ForbiddenException;
+import com.anthonypoon.authenticationserver.exception.impl.InternalServerException;
 import com.anthonypoon.authenticationserver.exception.impl.UnauthorizedException;
-import com.anthonypoon.authenticationserver.service.auth.AuthTokenService;
+import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
-import com.anthonypoon.authenticationserver.service.auth.exception.AuthTokenException;
+import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import com.anthonypoon.authenticationserver.service.auth.token.RefreshToken;
+import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
+import com.anthonypoon.authenticationserver.service.token.token.RefreshToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,13 +28,13 @@ import java.net.URISyntaxException;
 @Slf4j
 public class GetTokenUseCase {
     private final UserPrincipleService users;
-    private final AuthTokenService tokens;
+    private final TokenService tokens;
     private final PasswordEncoder encoder;
     private final AuthorizationConfig config;
 
     public GetTokenUseCase(
             UserPrincipleService users,
-            AuthTokenService tokens,
+            TokenService tokens,
             PasswordEncoder encoder,
             AuthorizationConfig config
     ) {
@@ -53,42 +55,43 @@ public class GetTokenUseCase {
         if (!this.encoder.matches(request.getPassword(), user.getPassword())) {
             throw new UnauthorizedException("Incorrect username or password.");
         }
-        if (StringUtils.isEmpty(request.getCallback())) {
-            var accessToken = this.tokens.signAccessToken(user);
-            var refreshToken = this.tokens.signRefreshToken(user);
-            return SuccessTokenResponse.builder()
-                    .identity(user.getIdentifier())
-                    .roles(user.getRoles())
-                    .access(accessToken.getTokenValue())
-                    .refresh(refreshToken.getTokenValue())
-                    .build();
-        } else {
-            var token = this.tokens.signRefreshToken(user);
-            return CallbackTokenResponse.builder()
-                    .callback(callback(request, token))
-                    .build();
+        try {
+            if (StringUtils.isEmpty(request.getCallback())) {
+                var accessToken = this.tokens.signAccessToken(user);
+                var refreshToken = this.tokens.signRefreshToken(user);
+                return SuccessTokenResponse.builder()
+                        .identity(user.getIdentifier())
+                        .roles(user.getRoles())
+                        .access(accessToken)
+                        .refresh(refreshToken)
+                        .build();
+            } else {
+                var token = this.tokens.signRefreshToken(user);
+                return CallbackTokenResponse.builder()
+                        .callback(callback(request, token))
+                        .build();
+            }
+        } catch (TokenEncodeException ex) {
+            throw new InternalServerException("Unable to sign refresh tokens", ex);
         }
+
     }
 
     public GetTokenResponse refresh(RefreshTokenRequest request) {
         RefreshToken token;
         try {
-            token = this.tokens.rehydrate(request.getToken(), RefreshToken.class);
-        } catch (AuthTokenException ex) {
+            token = this.tokens.decode(request.getToken(), RefreshToken.class);
+        } catch (TokenDecodeException ex) {
             log.debug("Unable to parse refresh token. Reason: %s".formatted(ex.getMessage()));
             throw new UnauthorizedException("Invalid refresh token");
         }
-        var user = this.users.getByIdentifier(token.getIdentifier()).orElse(null);
-        if (user == null) {
-            log.debug("User not found by username");
-            throw new UnauthorizedException("Incorrect username or password.");
-        }
+        var user = token.getUser();
         this.validate(user);
         var accessToken = this.tokens.signAccessToken(user);
         return SuccessTokenResponse.builder()
                 .identity(user.getIdentifier())
                 .roles(user.getRoles())
-                .access(accessToken.getTokenValue())
+                .access(accessToken)
                 .refresh(request.getToken())
                 .build();
     }
@@ -120,7 +123,7 @@ public class GetTokenUseCase {
         }
     }
 
-    private String callback(DefaultTokenRequest request, RefreshToken token) {
+    private String callback(DefaultTokenRequest request, String token) {
         if (StringUtils.isEmpty(request.getCallback())) {
             return null;
         }
@@ -137,8 +140,8 @@ public class GetTokenUseCase {
                     origin.getAuthority(),
                     origin.getPath(),
                     origin.getQuery() == null ?
-                            origin.getQuery() + "?token=" + token.getTokenValue() :
-                            origin.getQuery() + "&token=" + token.getTokenValue(),
+                            origin.getQuery() + "?token=" + token :
+                            origin.getQuery() + "&token=" + token,
                     origin.getFragment()
             );
             // TODO: Need to force state query?

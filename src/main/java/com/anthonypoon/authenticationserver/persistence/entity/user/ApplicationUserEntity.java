@@ -1,12 +1,14 @@
-package com.anthonypoon.authenticationserver.persistence.entity;
+package com.anthonypoon.authenticationserver.persistence.entity.user;
 
 import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.persistence.entity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Set;
 
@@ -15,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class ApplicationUser extends AuditableEntity {
+public class ApplicationUserEntity extends AuditableEntity {
     @Id
     @SequenceGenerator(name = "SEQ_APPLICATION_USER_ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_APPLICATION_USER_ID")
@@ -43,5 +45,5 @@ public class ApplicationUser extends AuditableEntity {
     private Set<UserRole> roles;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserProfile profile;
+    private UserProfileEntity profile;
 }

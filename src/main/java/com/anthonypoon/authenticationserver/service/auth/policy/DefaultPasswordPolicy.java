@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class NaivePasswordPolicy implements PasswordPolicy {
+public class DefaultPasswordPolicy implements PasswordPolicy {
     private static final int MIN_LENGTH = 8;
     @Override
     public void validate(String password) throws UserPrinciplePasswordException {
