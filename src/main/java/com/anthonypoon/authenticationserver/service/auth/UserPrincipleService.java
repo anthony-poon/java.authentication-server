@@ -1,8 +1,8 @@
 package com.anthonypoon.authenticationserver.service.auth;
 
-import com.anthonypoon.authenticationserver.persistence.entity.ApplicationUser;
-import com.anthonypoon.authenticationserver.persistence.entity.UserProfile;
-import com.anthonypoon.authenticationserver.persistence.repository.ApplicationUserRepository;
+import com.anthonypoon.authenticationserver.persistence.entity.user.ApplicationUserEntity;
+import com.anthonypoon.authenticationserver.persistence.entity.user.UserProfileEntity;
+import com.anthonypoon.authenticationserver.persistence.repository.user.ApplicationUserRepository;
 import com.anthonypoon.authenticationserver.service.auth.data.UserRegistrationData;
 import com.anthonypoon.authenticationserver.service.auth.data.UserUpdateData;
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrincipleDuplicatedException;
@@ -10,7 +10,6 @@ import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciple
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciplePasswordException;
 import com.anthonypoon.authenticationserver.service.auth.policy.PasswordPolicy;
 import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,11 +48,11 @@ public class UserPrincipleService {
         if (!existing.isEmpty()) {
             throw new UserPrincipleDuplicatedException("Registration data contains duplicated email", UserPrincipleDuplicatedException.Type.EMAIL);
         }
-        var users = new ArrayList<ApplicationUser>();
+        var users = new ArrayList<ApplicationUserEntity>();
         for (UserRegistrationData datum : data) {
             // TODO: Audit log
             this.policy.validate(datum.getPassword());
-            var user = ApplicationUser.builder()
+            var user = ApplicationUserEntity.builder()
                     .username(datum.getUsername())
                     .password(encoder.encode(datum.getPassword()))
                     .identifier(UUID.randomUUID().toString())
@@ -62,7 +61,7 @@ public class UserPrincipleService {
                     .isValidated(datum.isValidated())
                     .roles(datum.getRoles())
                     .build();
-            var profile = UserProfile.builder()
+            var profile = UserProfileEntity.builder()
                     .user(user)
                     .displayName(datum.getDisplayName())
                     .build();
@@ -89,7 +88,7 @@ public class UserPrincipleService {
         }
         var ids = data.stream().map(UserUpdateData::getUserId).toList();
         var currents = this.users.findAllByIdIn(ids).stream()
-                .collect(Collectors.toMap(ApplicationUser::getId, Function.identity()));
+                .collect(Collectors.toMap(ApplicationUserEntity::getId, Function.identity()));
         for (UserUpdateData datum : data) {
             var user = currents.get(datum.getUserId());
             if (user == null) {
@@ -98,13 +97,18 @@ public class UserPrincipleService {
             user.setEnabled(datum.isEnabled());
             user.setValidated(datum.isValidated());
             user.setRoles(datum.getRoles());
-            if (StringUtils.isNotEmpty(datum.getPassword())) {
-                // TODO: Audit log
-                user.setPassword(encoder.encode(datum.getPassword()));
-            }
         }
         this.users.saveAll(currents.values());
         return currents.values().stream().map(UserPrinciple::getInstance).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void changePassword(UserPrinciple user, String password) throws UserPrincipleNotFoundException {
+        var entity = this.users.findById(user.getId())
+                .orElseThrow(() -> new UserPrincipleNotFoundException("Unable to update password by id."));
+        var hash = this.encoder.encode(password);
+        // TODO: Audit
+        entity.setPassword(hash);
     }
 
     @Transactional
@@ -128,7 +132,7 @@ public class UserPrincipleService {
         return this.build(user);
     }
 
-    private Optional<UserPrinciple> build(ApplicationUser user) {
+    private Optional<UserPrinciple> build(ApplicationUserEntity user) {
         if (user == null) {
             return Optional.empty();
         }

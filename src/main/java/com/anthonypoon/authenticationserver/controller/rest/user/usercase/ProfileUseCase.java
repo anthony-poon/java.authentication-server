@@ -3,8 +3,8 @@ package com.anthonypoon.authenticationserver.controller.rest.user.usercase;
 import com.anthonypoon.authenticationserver.controller.rest.user.request.UpdateProfileRequest;
 import com.anthonypoon.authenticationserver.controller.rest.user.response.GetProfileResponse;
 import com.anthonypoon.authenticationserver.exception.impl.ResourceNotFoundException;
-import com.anthonypoon.authenticationserver.persistence.entity.UserProfile;
-import com.anthonypoon.authenticationserver.persistence.repository.UserProfileRepository;
+import com.anthonypoon.authenticationserver.persistence.entity.user.UserProfileEntity;
+import com.anthonypoon.authenticationserver.persistence.repository.user.UserProfileRepository;
 import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class ProfileUseCase {
         this.profiles.save(profile);
     }
 
-    private UserProfile getProfile(UserPrinciple user) {
+    private UserProfileEntity getProfile(UserPrinciple user) {
         var profile = this.profiles.findByUserId(user.getId())
                 .orElse(null);
         if (profile == null) {

@@ -1,7 +1,6 @@
 package com.anthonypoon.authenticationserver.config.initialization.runner;
 
 import com.anthonypoon.authenticationserver.config.initialization.InitializationConfig;
-import com.anthonypoon.authenticationserver.persistence.entity.UserProfile;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.auth.data.UserRegistrationData;
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrincipleDuplicatedException;

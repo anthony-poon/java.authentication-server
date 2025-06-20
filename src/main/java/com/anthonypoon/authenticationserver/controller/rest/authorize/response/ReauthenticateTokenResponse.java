@@ -1,6 +1,6 @@
 package com.anthonypoon.authenticationserver.controller.rest.authorize.response;
 
-import com.anthonypoon.authenticationserver.service.auth.token.ReauthenticationToken;
+import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -10,7 +10,7 @@ public class ReauthenticateTokenResponse extends GetTokenResponse {
 
     private String token;
 
-    public static ReauthenticateTokenResponse getInstance(ReauthenticationToken token) {
+    public static ReauthenticateTokenResponse getInstance(StepUpChallengeToken token) {
         return ReauthenticateTokenResponse.builder()
                 .token(token.getTokenValue())
                 .build();

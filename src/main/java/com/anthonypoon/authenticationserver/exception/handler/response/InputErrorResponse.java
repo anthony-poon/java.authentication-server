@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Getter
 public class InputErrorResponse implements ErrorResponse {
-    private final Map<String, String> errors  = new HashMap<>();
+    private final Map<String, String> errors = new HashMap<>();
     private final String message;
     private final String errorType;
 

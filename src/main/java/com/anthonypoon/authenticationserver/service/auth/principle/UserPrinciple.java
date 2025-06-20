@@ -1,7 +1,7 @@
 package com.anthonypoon.authenticationserver.service.auth.principle;
 
 import com.anthonypoon.authenticationserver.constant.UserRole;
-import com.anthonypoon.authenticationserver.persistence.entity.ApplicationUser;
+import com.anthonypoon.authenticationserver.persistence.entity.user.ApplicationUserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class UserPrinciple {
     private final boolean isEnabled;
     private final boolean isValidated;
     private final Set<UserRole> roles;
-    public static UserPrinciple getInstance(ApplicationUser user) {
+    public static UserPrinciple getInstance(ApplicationUserEntity user) {
         return UserPrinciple.builder()
                 .id(user.getId())
                 .identifier(user.getIdentifier())

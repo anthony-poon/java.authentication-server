@@ -1,12 +1,12 @@
 package com.anthonypoon.authenticationserver.config.security.web;
 
 import com.anthonypoon.authenticationserver.constant.TemporaryRole;
-import com.anthonypoon.authenticationserver.service.auth.AuthTokenService;
+import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
-import com.anthonypoon.authenticationserver.service.auth.exception.AuthTokenException;
+import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import com.anthonypoon.authenticationserver.service.auth.token.AccessToken;
-import com.anthonypoon.authenticationserver.service.auth.token.ReauthenticationToken;
+import com.anthonypoon.authenticationserver.service.token.token.AccessToken;
+import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 @Service
 @Primary
 public class WebAuthenticationManager implements AuthenticationManager {
-    private final AuthTokenService tokens;
+    private final TokenService tokens;
     private final UserPrincipleService users;
     private final HttpServletRequest requests;
 
-    public WebAuthenticationManager(AuthTokenService tokens, UserPrincipleService users, HttpServletRequest requests) {
+    public WebAuthenticationManager(TokenService tokens, UserPrincipleService users, HttpServletRequest requests) {
         this.tokens = tokens;
         this.users = users;
         this.requests = requests;
@@ -43,7 +43,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
             throw new BadCredentialsException("Missing jws token");
         }
         try {
-            var token = tokens.rehydrate(jws, AccessToken.class);
+            var token = tokens.decode(jws, AccessToken.class);
             var user = users.getByIdentifier(token.getIdentifier()).orElse(null);
             if (user == null) {
                 throw new BadCredentialsException("Invalid user identifier.");
@@ -56,7 +56,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
                     jws,
                     this.getAuthority(user)
             );
-        } catch (AuthTokenException ex) {
+        } catch (TokenDecodeException ex) {
             throw new BadCredentialsException("Invalid token.");
         }
     }
@@ -76,7 +76,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
             if (StringUtils.isEmpty(header)) {
                 return;
             }
-            var token = this.tokens.rehydrate(header, ReauthenticationToken.class);
+            var token = this.tokens.decode(header, StepUpChallengeToken.class);
             var user = this.users.getByIdentifier(token.getIdentifier()).orElse(null);
             if (user == null) {
                 throw new BadCredentialsException("Invalid user identifier.");
@@ -85,7 +85,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
                 throw new DisabledException("User is disabled");
             }
             roles.add(new SimpleGrantedAuthority("ROLE_" + TemporaryRole.REAUTHENTICATED_ACCESS));
-        } catch (AuthTokenException ex) {
+        } catch (TokenDecodeException ex) {
             throw new BadCredentialsException("Invalid token.");
         }
 

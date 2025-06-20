@@ -3,6 +3,11 @@ application:
     secret: some-very-very-very-very-very-very-very-very-very-very-long-secret
     callbacks:
       - http://localhost:4080/authorize/callback
+  security:
+    encryption-key: some-encryption-key
+    allowed-origins: http://localhost:4080
+  two-factor:
+    requirement: OPTIONAL
 
   services:
     keys:
@@ -21,3 +26,10 @@ application:
         password: P@ssw0rd
         roles:
           - ADMIN
+
+spring:
+  application:
+    name: authentication-server-dev
+  jpa:
+    hibernate:
+      ddl-auto: create

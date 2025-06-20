@@ -1,7 +1,7 @@
 package com.anthonypoon.authenticationserver.controller.rest.index.usecase;
 
 import com.anthonypoon.authenticationserver.controller.rest.index.response.HeartbeatResponse;
-import com.anthonypoon.authenticationserver.service.DateTimeService;
+import com.anthonypoon.authenticationserver.service.utils.DateTimeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.anthonypoon.authenicationserver.mock;
 
-import com.anthonypoon.authenticationserver.service.DateTimeService;
+import com.anthonypoon.authenticationserver.service.utils.DateTimeService;
 
 import java.time.ZonedDateTime;
 
