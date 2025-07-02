@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.service.token.claim;
+package com.anthonypoon.authenticationserver.service.token.decoder;
 
 import java.util.Map;
 

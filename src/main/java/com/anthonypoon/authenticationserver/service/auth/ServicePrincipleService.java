@@ -1,7 +1,7 @@
 package com.anthonypoon.authenticationserver.service.auth;
 
-import com.anthonypoon.authenticationserver.config.auth.ServicePrincipleConfig;
-import com.anthonypoon.authenticationserver.service.auth.principle.ServicePrincipal;
+import com.anthonypoon.authenticationserver.service.auth.config.ServicePrincipleConfig;
+import com.anthonypoon.authenticationserver.domains.auth.ServicePrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

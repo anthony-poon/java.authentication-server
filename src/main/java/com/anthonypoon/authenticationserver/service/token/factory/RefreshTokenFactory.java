@@ -3,12 +3,11 @@ package com.anthonypoon.authenticationserver.service.token.factory;
 import com.anthonypoon.authenticationserver.persistence.entity.token.RefreshTokenEntity;
 import com.anthonypoon.authenticationserver.persistence.repository.token.RefreshTokenRepository;
 import com.anthonypoon.authenticationserver.persistence.repository.user.ApplicationUserRepository;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import com.anthonypoon.authenticationserver.service.token.claim.ClaimEncoder;
-import com.anthonypoon.authenticationserver.service.utils.RandomService;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
+import com.anthonypoon.authenticationserver.service.token.decoder.ClaimEncoder;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
-import com.anthonypoon.authenticationserver.service.token.token.RefreshToken;
+import com.anthonypoon.authenticationserver.domains.token.RefreshToken;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

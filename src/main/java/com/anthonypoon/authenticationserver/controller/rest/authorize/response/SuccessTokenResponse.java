@@ -1,6 +1,6 @@
 package com.anthonypoon.authenticationserver.controller.rest.authorize.response;
 
-import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.domains.role.UserRole;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

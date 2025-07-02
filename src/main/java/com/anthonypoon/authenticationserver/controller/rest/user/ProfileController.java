@@ -5,7 +5,7 @@ import com.anthonypoon.authenticationserver.controller.rest.user.request.UpdateP
 import com.anthonypoon.authenticationserver.controller.rest.user.response.GetProfileResponse;
 import com.anthonypoon.authenticationserver.controller.rest.user.usercase.PasswordUseCase;
 import com.anthonypoon.authenticationserver.controller.rest.user.usercase.ProfileUseCase;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

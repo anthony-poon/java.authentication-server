@@ -1,6 +1,6 @@
 package com.anthonypoon.authenticationserver.controller.rest.authorize.usecase;
 
-import com.anthonypoon.authenticationserver.config.auth.AuthorizationConfig;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.config.AuthorizationConfig;
 import com.anthonypoon.authenticationserver.controller.rest.authorize.request.DefaultLoginRequest;
 import com.anthonypoon.authenticationserver.controller.rest.authorize.request.RefreshLoginRequest;
 import com.anthonypoon.authenticationserver.controller.rest.authorize.request.TOTPLoginRequest;
@@ -14,11 +14,11 @@ import com.anthonypoon.authenticationserver.exception.impl.UnauthorizedException
 import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
-import com.anthonypoon.authenticationserver.service.token.token.RefreshToken;
-import com.anthonypoon.authenticationserver.service.token.token.TwoFAChallengeToken;
-import com.anthonypoon.authenticationserver.service.twofa.TwoFactorService;
+import com.anthonypoon.authenticationserver.domains.token.RefreshToken;
+import com.anthonypoon.authenticationserver.domains.token.TwoFAChallengeToken;
+import com.anthonypoon.authenticationserver.service.twofa.TOTPService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,14 +34,14 @@ public class LoginUseCase {
     private final TokenService tokens;
     private final PasswordEncoder encoder;
     private final AuthorizationConfig config;
-    private final TwoFactorService twoFactors;
+    private final TOTPService twoFactors;
 
     public LoginUseCase(
             UserPrincipleService users,
             TokenService tokens,
             PasswordEncoder encoder,
             AuthorizationConfig config,
-            TwoFactorService twoFactors) {
+            TOTPService twoFactors) {
         this.users = users;
         this.tokens = tokens;
         this.encoder = encoder;
@@ -110,7 +110,7 @@ public class LoginUseCase {
         var user = this.users.getByIdentifier(token.getIdentifier())
                 .orElseThrow(() -> new ForbiddenException("Invalid user."));
         validate(user);
-        var isValid = this.twoFactors.checkTOTP(user, request.getTokenValue());
+        var isValid = this.twoFactors.checkToken(user, request.getTokenValue());
         if (!isValid) {
             throw new ForbiddenException("Invalid code.");
         }

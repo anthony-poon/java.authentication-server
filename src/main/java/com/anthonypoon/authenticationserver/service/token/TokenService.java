@@ -1,16 +1,16 @@
 package com.anthonypoon.authenticationserver.service.token;
 
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
 import com.anthonypoon.authenticationserver.service.token.factory.AccessTokenFactory;
 import com.anthonypoon.authenticationserver.service.token.factory.RefreshTokenFactory;
 import com.anthonypoon.authenticationserver.service.token.factory.StepUpChallengeTokenFactory;
 import com.anthonypoon.authenticationserver.service.token.factory.TokenFactory;
-import com.anthonypoon.authenticationserver.service.token.token.AccessToken;
-import com.anthonypoon.authenticationserver.service.token.token.RefreshToken;
-import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
-import com.anthonypoon.authenticationserver.service.token.token.Token;
+import com.anthonypoon.authenticationserver.domains.token.AccessToken;
+import com.anthonypoon.authenticationserver.domains.token.RefreshToken;
+import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.token.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

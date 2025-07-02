@@ -1,9 +1,9 @@
 package com.anthonypoon.authenticationserver.service.token.factory;
 
-import com.anthonypoon.authenticationserver.service.token.claim.ClaimEncoder;
+import com.anthonypoon.authenticationserver.service.token.decoder.ClaimEncoder;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

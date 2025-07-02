@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.config.auth;
+package com.anthonypoon.authenticationserver.service.auth.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

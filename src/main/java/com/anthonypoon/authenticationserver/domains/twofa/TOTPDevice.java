@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.service.twofa.data;
+package com.anthonypoon.authenticationserver.domains.twofa;
 
 import com.anthonypoon.authenticationserver.persistence.entity.totp.TOTPDeviceEntity;
 import com.anthonypoon.authenticationserver.service.twofa.config.TwoFactorConfig;
@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Getter
 @Builder
-public class TOTPDeviceData {
+public class TOTPDevice {
     private Long id;
     private String issuer;
     private String deviceName;
@@ -19,8 +19,8 @@ public class TOTPDeviceData {
     private Instant createdAt;
     private Instant lastUsedAt;
 
-    public static TOTPDeviceData getInstance(TOTPDeviceEntity device, TwoFactorConfig config, byte[] secret) {
-        return TOTPDeviceData.builder()
+    public static TOTPDevice getInstance(TOTPDeviceEntity device, TwoFactorConfig config, byte[] secret) {
+        return TOTPDevice.builder()
                 .id(device.getId())
                 .issuer(config.getIssuer())
                 .deviceName(device.getDeviceName())

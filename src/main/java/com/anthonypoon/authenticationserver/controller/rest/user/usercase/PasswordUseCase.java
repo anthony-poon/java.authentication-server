@@ -5,7 +5,7 @@ import com.anthonypoon.authenticationserver.exception.impl.ForbiddenException;
 import com.anthonypoon.authenticationserver.exception.impl.InternalServerException;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrincipleException;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.anthonypoon.authenticationserver.service.token.factory;
 
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
-import com.anthonypoon.authenticationserver.service.token.token.Token;
+import com.anthonypoon.authenticationserver.domains.token.Token;
 
 import java.time.Instant;
 import java.util.Date;

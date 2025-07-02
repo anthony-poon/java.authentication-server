@@ -1,6 +1,6 @@
 package com.anthonypoon.authenticationserver.service.auth.data;
 
-import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.domains.role.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 

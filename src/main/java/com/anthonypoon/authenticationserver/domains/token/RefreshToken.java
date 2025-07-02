@@ -1,6 +1,6 @@
-package com.anthonypoon.authenticationserver.service.token.token;
+package com.anthonypoon.authenticationserver.domains.token;
 
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

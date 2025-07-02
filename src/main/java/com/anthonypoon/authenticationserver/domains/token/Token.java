@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.service.token.token;
+package com.anthonypoon.authenticationserver.domains.token;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;

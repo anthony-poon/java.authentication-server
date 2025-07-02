@@ -1,6 +1,6 @@
 package com.anthonypoon.authenticationserver.controller.rest.authorize.response;
 
-import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

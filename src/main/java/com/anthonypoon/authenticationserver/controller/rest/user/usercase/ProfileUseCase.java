@@ -5,7 +5,7 @@ import com.anthonypoon.authenticationserver.controller.rest.user.response.GetPro
 import com.anthonypoon.authenticationserver.exception.impl.ResourceNotFoundException;
 import com.anthonypoon.authenticationserver.persistence.entity.user.UserProfileEntity;
 import com.anthonypoon.authenticationserver.persistence.repository.user.UserProfileRepository;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

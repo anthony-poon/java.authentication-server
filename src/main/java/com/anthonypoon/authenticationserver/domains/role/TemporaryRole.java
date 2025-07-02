@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.constant;
+package com.anthonypoon.authenticationserver.domains.role;
 
 public enum TemporaryRole implements ApplicationRole {
     REAUTHENTICATED_ACCESS,

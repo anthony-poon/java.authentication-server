@@ -1,10 +1,10 @@
-package com.anthonypoon.authenticationserver.service.token.token;
+package com.anthonypoon.authenticationserver.domains.token;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class StepUpChallengeToken extends Token {
+public class AccessToken extends Token {
     private final String identifier;
 }

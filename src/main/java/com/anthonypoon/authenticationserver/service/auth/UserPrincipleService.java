@@ -9,7 +9,7 @@ import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciple
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrincipleNotFoundException;
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciplePasswordException;
 import com.anthonypoon.authenticationserver.service.auth.policy.PasswordPolicy;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

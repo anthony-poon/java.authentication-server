@@ -4,7 +4,7 @@ import com.anthonypoon.authenticationserver.config.security.service.ServiceAuthe
 import com.anthonypoon.authenticationserver.config.security.service.ServiceAuthenticationManager;
 import com.anthonypoon.authenticationserver.config.security.web.WebAuthenticationFilter;
 import com.anthonypoon.authenticationserver.config.security.web.WebAuthenticationManager;
-import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.domains.role.UserRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

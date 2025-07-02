@@ -1,12 +1,12 @@
 package com.anthonypoon.authenticationserver.config.security.web;
 
-import com.anthonypoon.authenticationserver.constant.TemporaryRole;
+import com.anthonypoon.authenticationserver.domains.role.TemporaryRole;
 import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
-import com.anthonypoon.authenticationserver.service.token.token.AccessToken;
-import com.anthonypoon.authenticationserver.service.token.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.token.AccessToken;
+import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;

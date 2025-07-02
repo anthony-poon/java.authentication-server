@@ -5,10 +5,10 @@ import com.anthonypoon.authenticationserver.persistence.entity.totp.TOTPRecovery
 import com.anthonypoon.authenticationserver.persistence.repository.totp.TOTPDeviceEntityRepository;
 import com.anthonypoon.authenticationserver.persistence.repository.totp.TOTPRecoveryEntityRepository;
 import com.anthonypoon.authenticationserver.persistence.repository.user.ApplicationUserRepository;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.encryption.EncryptionService;
 import com.anthonypoon.authenticationserver.service.twofa.config.TwoFactorConfig;
-import com.anthonypoon.authenticationserver.service.twofa.data.TOTPDeviceData;
+import com.anthonypoon.authenticationserver.domains.twofa.TOTPDevice;
 import com.anthonypoon.authenticationserver.service.twofa.exception.TOTPException;
 import com.anthonypoon.authenticationserver.service.utils.RandomService;
 import org.springframework.stereotype.Service;
@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class TwoFactorService {
+public class TOTPService {
     private static final int TOTP_SECRET_LENGTH = 32;
     private static final int MAX_ITERATION = 10000;
     private final RandomService randoms;
@@ -34,7 +33,7 @@ public class TwoFactorService {
     private final TOTPRecoveryEntityRepository recoveries;
     private final TwoFactorConfig config;
 
-    public TwoFactorService(
+    public TOTPService(
             RandomService randoms,
             EncryptionService encryption,
             ApplicationUserRepository users,
@@ -50,7 +49,7 @@ public class TwoFactorService {
         this.config = config;
     }
 
-    public TOTPDeviceData registerDevice(UserPrinciple user, String deviceName) {
+    public TOTPDevice register(UserPrinciple user, String deviceName) {
         var secret = this.randoms.secure(TOTP_SECRET_LENGTH);
         var userEntity = this.users.findById(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id"));
@@ -61,10 +60,10 @@ public class TwoFactorService {
                 .user(userEntity)
                 .build();
         this.devices.save(device);
-        return TOTPDeviceData.getInstance(device, config, secret);
+        return TOTPDevice.getInstance(device, config, secret);
     }
 
-    public boolean validateTOTP(Long id, UserPrinciple user, String totp) {
+    public boolean validate(Long id, UserPrinciple user, String totp) {
         var device = this.devices.findByIdAndUser(id, user.getId())
                 .orElse(null);
         if (device == null) {
@@ -80,14 +79,14 @@ public class TwoFactorService {
         return true;
     }
 
-    public List<TOTPDeviceData> getDevices(UserPrinciple user) {
+    public List<TOTPDevice> getDevices(UserPrinciple user) {
         var devices = this.devices.findAllValidByUser(user.getId());
         return devices.stream()
-                .map(device -> TOTPDeviceData.getInstance(device, this.config, this.encryption.decrypt(device.getSecret())))
+                .map(device -> TOTPDevice.getInstance(device, this.config, this.encryption.decrypt(device.getSecret())))
                 .collect(Collectors.toList());
     }
 
-    public void unregisterDevice(UserPrinciple user, Long id) throws TOTPException {
+    public void unregister(UserPrinciple user, Long id) throws TOTPException {
         var devices = this.devices.findAllValidByUser(user.getId());
         if (devices.size() == 1) {
             throw new TOTPException("Cannot unregister the last device");
@@ -118,7 +117,7 @@ public class TwoFactorService {
         return recoveries;
     }
 
-    public boolean checkTOTP(UserPrinciple user, String totp) {
+    public boolean checkToken(UserPrinciple user, String totp) {
         var devices = this.devices.findAllValidByUser(user.getId());
         String token;
         for (TOTPDeviceEntity device : devices) {

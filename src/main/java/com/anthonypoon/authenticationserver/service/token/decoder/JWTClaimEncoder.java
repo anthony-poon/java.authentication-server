@@ -1,7 +1,7 @@
-package com.anthonypoon.authenticationserver.service.token.claim;
+package com.anthonypoon.authenticationserver.service.token.decoder;
 
 import com.anthonypoon.authenticationserver.service.utils.DateTimeService;
-import com.anthonypoon.authenticationserver.config.auth.AuthorizationConfig;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.config.AuthorizationConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.apache.commons.lang3.StringUtils;

@@ -1,14 +1,12 @@
 package com.anthonypoon.authenticationserver.persistence.entity.user;
 
-import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.domains.role.UserRole;
 import com.anthonypoon.authenticationserver.persistence.entity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Set;
 

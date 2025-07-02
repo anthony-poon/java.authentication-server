@@ -1,6 +1,6 @@
-package com.anthonypoon.authenticationserver.service.auth.principle;
+package com.anthonypoon.authenticationserver.domains.auth;
 
-import com.anthonypoon.authenticationserver.constant.UserRole;
+import com.anthonypoon.authenticationserver.domains.role.UserRole;
 import com.anthonypoon.authenticationserver.persistence.entity.user.ApplicationUserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

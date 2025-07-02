@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.config.auth;
+package com.anthonypoon.authenticationserver.controller.rest.authorize.config;
 
 import lombok.Getter;
 import lombok.Setter;

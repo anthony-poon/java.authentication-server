@@ -1,7 +1,7 @@
 package com.anthonypoon.authenticationserver.service.twofa.policy;
 
 import com.anthonypoon.authenticationserver.persistence.repository.totp.TOTPDeviceEntityRepository;
-import com.anthonypoon.authenticationserver.service.auth.principle.UserPrinciple;
+import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.twofa.config.TwoFactorConfig;
 import org.springframework.stereotype.Service;
 
