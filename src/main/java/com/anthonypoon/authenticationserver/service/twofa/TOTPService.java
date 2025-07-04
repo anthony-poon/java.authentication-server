@@ -88,9 +88,6 @@ public class TOTPService {
 
     public void unregister(UserPrinciple user, Long id) throws TOTPException {
         var devices = this.devices.findAllValidByUser(user.getId());
-        if (devices.size() == 1) {
-            throw new TOTPException("Cannot unregister the last device");
-        }
         var device = devices.stream().filter(s -> s.getId().equals(id)).findFirst();
         if (device.isEmpty()) {
             throw new TOTPException("Device not found.");

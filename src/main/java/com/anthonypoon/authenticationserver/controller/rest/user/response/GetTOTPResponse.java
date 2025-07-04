@@ -20,7 +20,11 @@ public class GetTOTPResponse {
                 .id(device.getId())
                 .deviceName(device.getDeviceName())
                 .createdAt(ZonedDateTime.ofInstant(device.getCreatedAt(), ZoneId.systemDefault()))
-                .lastUsedAt(ZonedDateTime.ofInstant(device.getLastUsedAt(), ZoneId.systemDefault()))
+                .lastUsedAt(
+                        device.getLastUsedAt().isEmpty()
+                                ? ZonedDateTime.ofInstant(device.getLastUsedAt().get(), ZoneId.systemDefault())
+                                : null
+                )
                 .build();
     }
 }

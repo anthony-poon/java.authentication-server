@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -15,6 +18,8 @@ import java.util.Base64;
 @Slf4j
 @Service
 public class EncryptionService {
+    private static final String ENCRYPTION_SALT = "x3KWBk6w9I";
+    private static final int SALT_ITERATION = 100000;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final String KEY_ALGO = "AES";
     private static final String CIPHER_ALGO = "AES/CBC/PKCS5Padding";
@@ -31,7 +36,7 @@ public class EncryptionService {
 
     public String encrypt(byte[] input) {
         try {
-            var secret = Base64.getDecoder().decode(this.config.getKey());
+            var secret = deriveAES256Key(this.config.getKey());
             var key = new SecretKeySpec(secret, KEY_ALGO);
             var iv = this.random(IV_LENGTH);
             Cipher cipher = Cipher.getInstance(CIPHER_ALGO);
@@ -48,7 +53,7 @@ public class EncryptionService {
 
     public byte[] decrypt(String input) {
         try {
-            var secret = Base64.getDecoder().decode(this.config.getKey());
+            var secret = deriveAES256Key(this.config.getKey());
             var combined = Base64.getDecoder().decode(input);
             var iv = new byte[IV_LENGTH];
             var cipherText = new byte[combined.length - IV_LENGTH];
@@ -76,5 +81,18 @@ public class EncryptionService {
         var rtn = new byte[length];
         SECURE_RANDOM.nextBytes(rtn);
         return rtn;
+    }
+
+    private byte[] deriveAES256Key(String inputSecret) {
+        byte[] salt = ENCRYPTION_SALT.getBytes(StandardCharsets.UTF_8);
+
+        try {
+            var factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            var spec = new PBEKeySpec(inputSecret.toCharArray(), salt, SALT_ITERATION, 256);
+            var key = factory.generateSecret(spec);
+            return key.getEncoded();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to derive AES key: " + e.getMessage(), e);
+        }
     }
 }

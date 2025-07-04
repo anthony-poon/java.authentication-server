@@ -50,6 +50,7 @@ public class TOTPUseCase {
         return RegisterTOTPResponse.builder()
                 .id(device.getId())
                 .url(url)
+                .secret(secret)
                 .build();
     }
 

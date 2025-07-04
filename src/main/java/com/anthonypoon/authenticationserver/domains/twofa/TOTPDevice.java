@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -19,6 +20,10 @@ public class TOTPDevice {
     private Instant createdAt;
     private Instant lastUsedAt;
 
+    public Optional<Instant> getLastUsedAt() {
+        return Optional.of(lastUsedAt);
+    }
+
     public static TOTPDevice getInstance(TOTPDeviceEntity device, TwoFactorConfig config, byte[] secret) {
         return TOTPDevice.builder()
                 .id(device.getId())
@@ -28,7 +33,7 @@ public class TOTPDevice {
                 .tokenLength(config.getTokenLength())
                 .secret(secret)
                 .createdAt(Instant.now())
-                .lastUsedAt(null)
+                .lastUsedAt(device.getLastUsedAt())
                 .build();
     }
 }

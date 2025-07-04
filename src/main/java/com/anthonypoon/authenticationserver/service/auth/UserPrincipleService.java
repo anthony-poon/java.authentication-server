@@ -10,14 +10,13 @@ import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciple
 import com.anthonypoon.authenticationserver.service.auth.exception.UserPrinciplePasswordException;
 import com.anthonypoon.authenticationserver.service.auth.policy.PasswordPolicy;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
+import com.anthonypoon.authenticationserver.service.encryption.EncryptionService;
+import com.google.common.io.BaseEncoding;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,11 +25,13 @@ public class UserPrincipleService {
     private final ApplicationUserRepository users;
     private final PasswordEncoder encoder;
     private final PasswordPolicy policy;
+    private final EncryptionService encryption;
 
-    public UserPrincipleService(ApplicationUserRepository users, PasswordEncoder encoder, PasswordPolicy policy) {
+    public UserPrincipleService(ApplicationUserRepository users, PasswordEncoder encoder, PasswordPolicy policy, EncryptionService encryption) {
         this.users = users;
         this.encoder = encoder;
         this.policy = policy;
+        this.encryption = encryption;
     }
 
     @Transactional
@@ -55,7 +56,7 @@ public class UserPrincipleService {
             var user = ApplicationUserEntity.builder()
                     .username(datum.getUsername())
                     .password(encoder.encode(datum.getPassword()))
-                    .identifier(UUID.randomUUID().toString())
+                    .identifier(deriveIdentifier(datum))
                     .email(datum.getEmail())
                     .isEnabled(true)
                     .isValidated(datum.isValidated())
@@ -139,4 +140,7 @@ public class UserPrincipleService {
         return Optional.of(UserPrinciple.getInstance(user));
     }
 
+    private String deriveIdentifier(UserRegistrationData datum) {
+        return BaseEncoding.base32().encode(this.encryption.hash(datum.getUsername()));
+    }
 }
