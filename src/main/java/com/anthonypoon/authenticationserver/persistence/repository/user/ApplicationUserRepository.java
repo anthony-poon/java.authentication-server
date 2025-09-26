@@ -12,7 +12,7 @@ public interface ApplicationUserRepository extends JpaRepository<ApplicationUser
     Optional<ApplicationUserEntity> findByIdentifier(String hash);
     Optional<ApplicationUserEntity> findByUsername(String username);
     List<ApplicationUserEntity> findAllByUsernameIn(List<String> username);
-    Optional<ApplicationUserEntity> findByEmail(String email);
     List<ApplicationUserEntity> findAllByEmailIn(List<String> emails);
     List<ApplicationUserEntity> findAllByIdIn(List<Long> id);
+    List<ApplicationUserEntity> findAllByIdentifierIn(List<String> hash);
 }

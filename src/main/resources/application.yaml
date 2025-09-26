@@ -1,5 +1,14 @@
 application:
+  http-client:
+    mailgun:
+      url: https://api.mailgun.net/v3/example.com
+      username: api
+      password: ${MAILGUN_API_KEY}
+  mail:
+    from: no-reply@example.com
+    base-url: http://localhost:4080
   authorization:
+    require-validation: true
     secret:
     callbacks:
       - http://localhost:4080/authorize/callback

@@ -1,16 +1,21 @@
 package com.anthonypoon.authenticationserver.controller.rest.authorize.usecase;
 
 import com.anthonypoon.authenticationserver.controller.rest.authorize.config.AuthorizationConfig;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.request.DefaultLoginRequest;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.request.RefreshLoginRequest;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.request.TOTPLoginRequest;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.response.GetTokenResponse;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.response.CallbackTokenResponse;
-import com.anthonypoon.authenticationserver.controller.rest.authorize.response.SuccessTokenResponse;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.request.login.DefaultLoginRequest;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.request.login.ReauthenticateLoginRequest;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.request.login.RefreshLoginRequest;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.request.login.TOTPLoginRequest;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.response.login.LoginResponse;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.response.login.CallbackLoginResponse;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.response.login.RequireTwoFALoginResponse;
+import com.anthonypoon.authenticationserver.controller.rest.authorize.response.login.SuccessLoginResponse;
+import com.anthonypoon.authenticationserver.domains.role.StepUpRole;
 import com.anthonypoon.authenticationserver.exception.impl.BadRequestException;
 import com.anthonypoon.authenticationserver.exception.impl.ForbiddenException;
 import com.anthonypoon.authenticationserver.exception.impl.InternalServerException;
 import com.anthonypoon.authenticationserver.exception.impl.UnauthorizedException;
+import com.anthonypoon.authenticationserver.service.auth.policy.UserPrinciplePolicy;
+import com.anthonypoon.authenticationserver.service.twofa.policy.TwoFactorPolicy;
 import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
@@ -26,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -34,45 +40,54 @@ public class LoginUseCase {
     private final TokenService tokens;
     private final PasswordEncoder encoder;
     private final AuthorizationConfig config;
-    private final TOTPService twoFactors;
+    private final TwoFactorPolicy twoFactorPolicy;
+    private final UserPrinciplePolicy userPolicy;
+    private final TOTPService totp;
 
     public LoginUseCase(
             UserPrincipleService users,
             TokenService tokens,
             PasswordEncoder encoder,
             AuthorizationConfig config,
-            TOTPService twoFactors) {
+            TwoFactorPolicy twoFactorPolicy,
+            UserPrinciplePolicy userPolicy,
+            TOTPService totp
+    ) {
         this.users = users;
         this.tokens = tokens;
         this.encoder = encoder;
         this.config = config;
-        this.twoFactors = twoFactors;
+        this.twoFactorPolicy = twoFactorPolicy;
+        this.userPolicy = userPolicy;
+        this.totp = totp;
     }
 
-    public GetTokenResponse login(DefaultLoginRequest request) {
+    public LoginResponse login(DefaultLoginRequest request) {
         var user = this.users.getByUsername(request.getUsername()).orElse(null);
         if (user == null) {
             log.debug("User not found by username");
             throw new UnauthorizedException("Incorrect username or password.");
         }
 
-        this.validate(user);
+        if (this.userPolicy.isInvalid(user)) {
+            throw new UnauthorizedException("Account is disabled or have not been validated");
+        }
         if (!this.encoder.matches(request.getPassword(), user.getPassword())) {
             throw new UnauthorizedException("Incorrect username or password.");
+        }
+        if (this.twoFactorPolicy.isRequired(user)) {
+            return RequireTwoFALoginResponse.builder()
+                    .challenge(this.tokens.signTwoFAChallengeToken(user))
+                    .build();
         }
         try {
             if (StringUtils.isEmpty(request.getCallback())) {
                 var access = this.tokens.signAccessToken(user);
                 var refresh = this.tokens.signRefreshToken(user);
-                return SuccessTokenResponse.builder()
-                        .identity(user.getIdentifier())
-                        .roles(user.getRoles())
-                        .access(access)
-                        .refresh(refresh)
-                        .build();
+                return SuccessLoginResponse.getInstance(user, access, refresh);
             } else {
                 var refresh = this.tokens.signRefreshToken(user);
-                return CallbackTokenResponse.builder()
+                return CallbackLoginResponse.builder()
                         .callback(getCallbackUrl(request, refresh))
                         .build();
             }
@@ -81,7 +96,7 @@ public class LoginUseCase {
         }
     }
 
-    public GetTokenResponse refresh(RefreshLoginRequest request) {
+    public LoginResponse refresh(RefreshLoginRequest request) {
         RefreshToken token;
         try {
             token = this.tokens.decode(request.getToken(), RefreshToken.class);
@@ -90,17 +105,14 @@ public class LoginUseCase {
             throw new UnauthorizedException("Invalid refresh token");
         }
         var user = token.getUser();
-        this.validate(user);
-        var accessToken = this.tokens.signAccessToken(user);
-        return SuccessTokenResponse.builder()
-                .identity(user.getIdentifier())
-                .roles(user.getRoles())
-                .access(accessToken)
-                .refresh(request.getToken())
-                .build();
+        if (this.userPolicy.isInvalid(user)) {
+            throw new UnauthorizedException("Account is disabled or have not been validated");
+        }
+        var access = this.tokens.signAccessToken(user);
+        return SuccessLoginResponse.getInstance(user, access, request.getToken());
     }
 
-    public GetTokenResponse totp(TOTPLoginRequest request) {
+    public LoginResponse totp(TOTPLoginRequest request) {
         TwoFAChallengeToken token;
         try {
             token = this.tokens.decode(request.getChallenge(), TwoFAChallengeToken.class);
@@ -109,8 +121,10 @@ public class LoginUseCase {
         }
         var user = this.users.getByIdentifier(token.getIdentifier())
                 .orElseThrow(() -> new ForbiddenException("Invalid user."));
-        validate(user);
-        var isValid = this.twoFactors.checkToken(user, request.getTokenValue());
+        if (this.userPolicy.isInvalid(user)) {
+            throw new UnauthorizedException("Account is disabled or have not been validated");
+        }
+        var isValid = this.totp.checkToken(user, request.getCode());
         if (!isValid) {
             throw new ForbiddenException("Invalid code.");
         }
@@ -118,42 +132,26 @@ public class LoginUseCase {
         try {
             var access = tokens.signAccessToken(user);
             var refresh = tokens.signRefreshToken(user);
-            return SuccessTokenResponse.builder()
-                    .identity(user.getIdentifier())
-                    .roles(user.getRoles())
-                    .access(access)
-                    .refresh(refresh)
-                    .build();
+            return SuccessLoginResponse.getInstance(user, access, refresh);
         } catch (TokenEncodeException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-//    public GetTokenResponse reauthenticate(UserPrinciple principle, ReauthenticateTokenRequest request) {
-//        var user = this.users.getByIdentifier(principle.getIdentifier()).orElse(null);
-//        if (user == null) {
-//            log.debug("User not found by username");
-//            throw new UnauthorizedException("Incorrect username or password.");
-//        }
-//        this.validate(user);
-//        if (!this.encoder.matches(request.getPassword(), user.getPassword())) {
-//            throw new UnauthorizedException("Incorrect username or password.");
-//        }
-//        try {
-//            var token = this.tokens.signReauthenticateToken(principle);
-//            return ReauthenticateTokenResponse.getInstance(token);
-//        } catch (AuthTokenException ex) {
-//            throw new InternalServerException(ex);
-//        }
-//    }
-
-    private void validate(UserPrinciple user) {
-        if (!user.isEnabled()) {
-            throw new UnauthorizedException("Account is disabled.");
+    public LoginResponse reauthenticate(UserPrinciple user, ReauthenticateLoginRequest request) {
+        if (this.userPolicy.isInvalid(user)) {
+            throw new UnauthorizedException("Account is disabled or have not been validated");
         }
-        if (!user.isValidated()) {
-            throw new UnauthorizedException("Account have not been validated");
+        if (!this.encoder.matches(request.getPassword(), user.getPassword())) {
+            throw new UnauthorizedException("Incorrect username or password.");
+        }
+        try {
+            var access = tokens.signAccessToken(user);
+            var refresh = tokens.signRefreshToken(user);
+            return SuccessLoginResponse.getInstance(user, access, refresh, List.of(StepUpRole.REAUTHENTICATED_ACCESS));
+        } catch (TokenEncodeException ex) {
+            throw new InternalServerException(ex);
         }
     }
 

@@ -3,9 +3,10 @@ package com.anthonypoon.authenticationserver.service.twofa.policy;
 import com.anthonypoon.authenticationserver.persistence.repository.totp.TOTPDeviceEntityRepository;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.twofa.config.TwoFactorConfig;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+@Component
 public class TwoFactorPolicy {
     private final TwoFactorConfig config;
     private final TOTPDeviceEntityRepository totps;

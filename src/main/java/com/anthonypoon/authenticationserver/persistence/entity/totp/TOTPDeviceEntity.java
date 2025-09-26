@@ -13,10 +13,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@Table(name = "totp_device")
 public class TOTPDeviceEntity extends AuditableEntity {
     @Id
-    @SequenceGenerator(name = "SEQ_TOTP_DEVICE_ENTRY_ID")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TOTP_DEVICE_ENTRY_ID")
+    @SequenceGenerator(name = "SEQ_TOTP_DEVICE_ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TOTP_DEVICE_ID")
     private Long id;
 
     private String deviceName;

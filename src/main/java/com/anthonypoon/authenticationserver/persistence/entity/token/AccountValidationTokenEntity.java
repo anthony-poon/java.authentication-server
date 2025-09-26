@@ -1,6 +1,5 @@
 package com.anthonypoon.authenticationserver.persistence.entity.token;
 
-import com.anthonypoon.authenticationserver.persistence.entity.user.ApplicationUserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +12,13 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @Table(
-        name = "token_refresh",
+        name = "token_account_validation",
         uniqueConstraints = { @UniqueConstraint(columnNames = { "identifier", "token_value" }) }
 )
-public class RefreshTokenEntity extends TokenEntity {
+public class AccountValidationTokenEntity extends TokenEntity {
     @Id
-    @SequenceGenerator(name = "SEQ_TOKEN_REFRESH_ID")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TOKEN_REFRESH_ID")
+    @SequenceGenerator(name = "SEQ_TOKEN_ACCOUNT_VALIDATION_ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TOKEN_ACCOUNT_VALIDATION_ID")
     private Long id;
 
     // Store the user identifier directly instead of a @ManyToOne mapping.

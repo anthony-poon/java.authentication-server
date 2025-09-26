@@ -4,11 +4,13 @@ import com.anthonypoon.authenticationserver.persistence.entity.token.RefreshToke
 import com.anthonypoon.authenticationserver.persistence.repository.token.RefreshTokenRepository;
 import com.anthonypoon.authenticationserver.persistence.repository.user.ApplicationUserRepository;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
+import com.anthonypoon.authenticationserver.service.auth.policy.UserPrinciplePolicy;
 import com.anthonypoon.authenticationserver.service.token.decoder.ClaimEncoder;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
 import com.anthonypoon.authenticationserver.domains.token.RefreshToken;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -18,15 +20,17 @@ public class RefreshTokenFactory extends TokenFactory<RefreshToken, UserPrincipl
     private static final int TTL = 24 * 60 * 60;
     private final RefreshTokenRepository tokens;
     private final ApplicationUserRepository users;
+    private final UserPrinciplePolicy policy;
     private final ClaimEncoder encoder;
 
     public RefreshTokenFactory(
             RefreshTokenRepository tokens,
             ApplicationUserRepository users,
-            ClaimEncoder encoder
+            UserPrinciplePolicy policy, ClaimEncoder encoder
     ){
         this.tokens = tokens;
         this.users = users;
+        this.policy = policy;
         this.encoder = encoder;
     }
 
@@ -36,17 +40,18 @@ public class RefreshTokenFactory extends TokenFactory<RefreshToken, UserPrincipl
     }
 
     @Override
+    @Transactional
     public String sign(UserPrinciple user) throws TokenEncodeException {
         var claim = new HashMap<String, Object>();
         claim.put("identifier", user.getIdentifier());
-        var tokenValue = this.encoder.encode(claim, TTL);
-        var userEntity = this.users.findByIdentifier(user.getIdentifier())
-                .orElseThrow(() -> new TokenEncodeException("Cannot fetch user entity"));
-        if (!userEntity.isEnabled() || !userEntity.isValidated()) {
+        if (policy.isInvalid(user)) {
             throw new TokenEncodeException("User entity is not active or validated");
         }
+        var tokenValue = this.encoder.encode(claim, TTL);
+        this.tokens.invalidate(user.getIdentifier(), Instant.now());
         var token = RefreshTokenEntity.builder()
                 .tokenValue(tokenValue)
+                .identifier(user.getIdentifier())
                 .expireAt(Instant.now().plusSeconds(TTL))
                 .build();
         this.tokens.save(token);
@@ -61,14 +66,15 @@ public class RefreshTokenFactory extends TokenFactory<RefreshToken, UserPrincipl
         var identifier = claims.get("identifier").toString();
         var userEntity = this.users.findByIdentifier(identifier)
                 .orElseThrow(() -> new TokenDecodeException("Cannot fetch user by identifier"));
-        if (!userEntity.isEnabled() || !userEntity.isValidated()) {
+        var user = UserPrinciple.getInstance(userEntity);
+        if (policy.isInvalid(user)) {
             throw new TokenDecodeException("User entity is not active or validated");
         }
         if (token.getExpireAt().isBefore(Instant.now())) {
             throw new TokenDecodeException("Token is expired");
         }
         return RefreshToken.builder()
-                .user(UserPrinciple.getInstance(userEntity))
+                .user(user)
                 .tokenValue(tokenValue)
                 .expireAt(token.getExpireAt())
                 .build();

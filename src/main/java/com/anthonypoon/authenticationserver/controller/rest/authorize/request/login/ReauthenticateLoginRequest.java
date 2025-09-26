@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.controller.rest.authorize.request;
+package com.anthonypoon.authenticationserver.controller.rest.authorize.request.login;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.controller.rest.authorize.request;
+package com.anthonypoon.authenticationserver.controller.rest.authorize.request.login;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
         @JsonSubTypes.Type(value = DefaultLoginRequest.class, name = "DEFAULT"),
         @JsonSubTypes.Type(value = RefreshLoginRequest.class, name = "REFRESH"),
         @JsonSubTypes.Type(value = ReauthenticateLoginRequest.class, name = "REAUTHENTICATE"),
+        @JsonSubTypes.Type(value = TOTPLoginRequest.class, name = "TOTP"),
 })
 public abstract class LoginRequest {
     @NotNull
@@ -26,6 +27,7 @@ public abstract class LoginRequest {
     public enum Type {
         DEFAULT,
         REFRESH,
-        REAUTHENTICATE
+        REAUTHENTICATE,
+        TOTP,
     }
 }

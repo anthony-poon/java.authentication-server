@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@Table(name = "application_user")
 public class ApplicationUserEntity extends AuditableEntity {
     @Id
     @SequenceGenerator(name = "SEQ_APPLICATION_USER_ID")

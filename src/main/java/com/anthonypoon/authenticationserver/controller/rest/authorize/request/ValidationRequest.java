@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultLoginRequest extends LoginRequest {
+public class ValidationRequest {
     @NotBlank
-    private String username;
-    @NotBlank
-    private String password;
-    private String callback;
+    private String tokenValue;
 }

@@ -1,16 +1,10 @@
 package com.anthonypoon.authenticationserver.service.token;
 
+import com.anthonypoon.authenticationserver.domains.token.*;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenEncodeException;
-import com.anthonypoon.authenticationserver.service.token.factory.AccessTokenFactory;
-import com.anthonypoon.authenticationserver.service.token.factory.RefreshTokenFactory;
-import com.anthonypoon.authenticationserver.service.token.factory.StepUpChallengeTokenFactory;
-import com.anthonypoon.authenticationserver.service.token.factory.TokenFactory;
-import com.anthonypoon.authenticationserver.domains.token.AccessToken;
-import com.anthonypoon.authenticationserver.domains.token.RefreshToken;
-import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
-import com.anthonypoon.authenticationserver.domains.token.Token;
+import com.anthonypoon.authenticationserver.service.token.factory.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +32,18 @@ public class TokenService {
         return factory.sign(user);
     }
 
-    public String signReauthenticateToken(UserPrinciple user) {
-        var factory = (StepUpChallengeTokenFactory) this.getFactory(StepUpChallengeToken.class);
+    public String signReauthenticationToken(UserPrinciple user) {
+        var factory = (ReauthenticationTokenFactory) this.getFactory(ReauthenticationToken.class);
+        return factory.sign(user);
+    }
+
+    public String signTwoFAChallengeToken(UserPrinciple user) {
+        var factory = (TwoFAChallengeTokenFactory) this.getFactory(TwoFAChallengeToken.class);
+        return factory.sign(user);
+    }
+
+    public String signAccountConfirmationToken(UserPrinciple user) {
+        var factory = (AccountValidationTokenFactory) this.getFactory(AccountValidationToken.class);
         return factory.sign(user);
     }
 

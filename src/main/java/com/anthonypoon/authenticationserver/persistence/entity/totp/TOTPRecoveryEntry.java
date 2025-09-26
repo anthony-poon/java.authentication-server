@@ -13,6 +13,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "totp_recovery")
 public class TOTPRecoveryEntry extends AuditableEntity {
     @Id
     @SequenceGenerator(name = "SEQ_TOTP_RECOVERY_ID")

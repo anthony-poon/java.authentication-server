@@ -3,23 +3,23 @@ package com.anthonypoon.authenticationserver.service.token.factory;
 import com.anthonypoon.authenticationserver.service.token.decoder.ClaimEncoder;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
-import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.token.ReauthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
 @Component
-public class StepUpChallengeTokenFactory extends TokenFactory<StepUpChallengeToken, UserPrinciple> {
+public class ReauthenticationTokenFactory extends TokenFactory<ReauthenticationToken, UserPrinciple> {
     private static final int TTL = 10 * 60 * 60;
     private final ClaimEncoder encoder;
 
-    public StepUpChallengeTokenFactory(ClaimEncoder encoder) {
+    public ReauthenticationTokenFactory(ClaimEncoder encoder) {
         this.encoder = encoder;
     }
 
     @Override
-    public Class<StepUpChallengeToken> getType() {
-        return StepUpChallengeToken.class;
+    public Class<ReauthenticationToken> getType() {
+        return ReauthenticationToken.class;
     }
 
     @Override
@@ -30,9 +30,9 @@ public class StepUpChallengeTokenFactory extends TokenFactory<StepUpChallengeTok
     }
 
     @Override
-    public StepUpChallengeToken decode(String tokenValue) throws TokenDecodeException {
+    public ReauthenticationToken decode(String tokenValue) throws TokenDecodeException {
         var claims = this.encoder.decode(tokenValue);
-        return StepUpChallengeToken.builder()
+        return ReauthenticationToken.builder()
                 .identifier((String) claims.get("identifier"))
                 .tokenValue(tokenValue)
                 .expireAt(getExpiration(claims))

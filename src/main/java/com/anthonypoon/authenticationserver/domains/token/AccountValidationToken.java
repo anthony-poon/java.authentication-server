@@ -5,6 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class StepUpChallengeToken extends Token {
-    private final String identifier;
+public class AccountValidationToken extends Token {
+    private String identifier;
 }

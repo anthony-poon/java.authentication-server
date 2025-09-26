@@ -46,6 +46,7 @@ public class SecurityConfigurator {
     @Order(1)
     public SecurityFilterChain webFilterChain(HttpSecurity http, WebAuthenticationFilter filter, WebAuthenticationManager manager) throws Exception {
         http
+                .securityMatcher("/**")
                 .authenticationManager(manager)
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)

@@ -15,6 +15,7 @@ public class UserPrinciple {
     private final Long id;
     private final String identifier;
     private final String password;
+    private final String email;
     private final boolean isEnabled;
     private final boolean isValidated;
     private final Set<UserRole> roles;
@@ -23,6 +24,7 @@ public class UserPrinciple {
                 .id(user.getId())
                 .identifier(user.getIdentifier())
                 .password(user.getPassword())
+                .email(user.getEmail())
                 .isEnabled(user.isEnabled())
                 .isValidated(user.isValidated())
                 .roles(user.getRoles())

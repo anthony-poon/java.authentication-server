@@ -1,0 +1,18 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!--
+  @thymesVar id="context" type="com.anthonypoon.authenticationserver.service.email.mail.AccountConfirmationMail.Context"
+-->
+<p>Dear User,</p>
+<p>Thank you for creating an account.</p>
+<p>To complete the registration process, please verify your email address by clicking the link below. This verification link will remain active for the next 10 minutes:</p>
+<p>
+    <a th:href="${context.url}">Verification Link</a>
+</p>
+</body>
+</html>

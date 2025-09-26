@@ -1,12 +1,12 @@
 package com.anthonypoon.authenticationserver.config.security.web;
 
-import com.anthonypoon.authenticationserver.domains.role.TemporaryRole;
+import com.anthonypoon.authenticationserver.domains.role.StepUpRole;
 import com.anthonypoon.authenticationserver.service.token.TokenService;
 import com.anthonypoon.authenticationserver.service.auth.UserPrincipleService;
 import com.anthonypoon.authenticationserver.service.token.exception.TokenDecodeException;
 import com.anthonypoon.authenticationserver.domains.auth.UserPrinciple;
 import com.anthonypoon.authenticationserver.domains.token.AccessToken;
-import com.anthonypoon.authenticationserver.domains.token.StepUpChallengeToken;
+import com.anthonypoon.authenticationserver.domains.token.ReauthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
@@ -76,7 +76,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
             if (StringUtils.isEmpty(header)) {
                 return;
             }
-            var token = this.tokens.decode(header, StepUpChallengeToken.class);
+            var token = this.tokens.decode(header, ReauthenticationToken.class);
             var user = this.users.getByIdentifier(token.getIdentifier()).orElse(null);
             if (user == null) {
                 throw new BadCredentialsException("Invalid user identifier.");
@@ -84,7 +84,7 @@ public class WebAuthenticationManager implements AuthenticationManager {
             if (!user.isEnabled()) {
                 throw new DisabledException("User is disabled");
             }
-            roles.add(new SimpleGrantedAuthority("ROLE_" + TemporaryRole.REAUTHENTICATED_ACCESS));
+            roles.add(new SimpleGrantedAuthority("ROLE_" + StepUpRole.REAUTHENTICATED_ACCESS));
         } catch (TokenDecodeException ex) {
             throw new BadCredentialsException("Invalid token.");
         }

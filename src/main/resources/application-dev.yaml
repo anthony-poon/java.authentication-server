@@ -1,4 +1,12 @@
 application:
+  http-client:
+    mailgun:
+      url: https://api.mailgun.net/v3/mail.anthony-poon.com
+      username: api
+      password: ${MAILGUN_API_KEY}
+  mail:
+    from: no-reply@mail.anthony-poon.com
+    base-url: http://localhost:4080
   authorization:
     secret: some-very-very-very-very-very-very-very-very-very-very-long-secret
     callbacks:

@@ -1,4 +1,4 @@
-package com.anthonypoon.authenticationserver.controller.rest.authorize.request;
+package com.anthonypoon.authenticationserver.controller.rest.authorize.request.login;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TOTPLoginRequest extends LoginRequest {
     @NotBlank
-    private String tokenValue;
+    private String code;
     @NotBlank
     private String challenge;
 }
